@@ -3,8 +3,10 @@ services:
     nginx:
         image: nginx:alpine
         container_name: nginx
+        env_file:
+            - ".env"
         environment:
-           - NGINX_HOST=hostname
+           - NGINX_HOST=${NGINX_HOST}
         ports:
             - "80:80"
         volumes:
