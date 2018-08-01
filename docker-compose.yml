@@ -1,0 +1,32 @@
+version: '2'
+services:
+    nginx:
+      image: nginx:alpine
+      container_name: nginx
+      ports:
+            - "80:80"
+      volumes:
+            - ./www:/www
+            - ./hostname.conf:/etc/nginx/conf.d/hostname.conf
+      links:
+            - php
+    php:
+      image: php:fpm-alpine
+      container_name: pfp-fpm
+      volumes:
+            - ./www:/www
+    percona:
+      image: percona
+      container_name: percona
+      env_file:
+          - ".env"
+      environment:
+          - MYSQL_DATABASE=${MYSQL_DATABASE}
+          - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+          - MYSQL_USER=${MYSQL_USER}
+          - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      ports:
+          - "3306:3306"
+      volumes:
+          - "./mysql:/var/lib/mysql"
+
