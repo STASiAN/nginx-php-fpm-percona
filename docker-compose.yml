@@ -1,29 +1,31 @@
 version: '2'
+networks:
+    frontend:
+    backend:
 services:
     nginx:
         image: nginx:alpine
         container_name: nginx
         env_file:
             - ".env"
-        environment:
-           - NGINX_HOST=${NGINX_HOST}
+        networks:
+            - frontend
         ports:
             - "80:80"
         volumes:
             - ./www:/www
-            - ./hostname.conf:/etc/nginx/conf.d/web.template
-        command: sh -c "envsubst \"`env | awk -F = '{printf \" $$%s\", $$1}'`\" < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
-        links:
-          - php-fpm
+            - ./default.conf:/etc/nginx/conf.d/default.conf
+#        command: sh -c "envsubst \"`env | awk -F = '{printf \" $$%s\", $$1}'`\" < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
     php-fpm:
         #image: fpm-alpine-mysqli
         build: .
         image: php-fpm-mysqli
         container_name: php-fpm
+        networks:
+            - frontend
+            - backend
         volumes:
-                - ./www:/www
-        links:
-          - percona
+            - ./www:/www
     percona:
         image: percona
         container_name: percona
@@ -34,8 +36,12 @@ services:
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
             - MYSQL_USER=${MYSQL_USER}
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-        ports:
-            - "3306:3306"
+        networks:
+            - frontend
+            - backend        
         volumes:
             - ./mysql:/var/lib/mysql
             - ./percona.cnf:/etc/mysql/percona-server.conf.d/percona.cnf
+        networks:
+            - frontend
+            - backend
