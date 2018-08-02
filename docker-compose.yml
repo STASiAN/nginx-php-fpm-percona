@@ -16,22 +16,26 @@ services:
         links:
           - php-fpm
     php-fpm:
-          image: php:fpm-alpine
-          container_name: php-fpm
-          volumes:
+        #image: fpm-alpine-mysqli
+        build: .
+        image: php-fpm-mysqli
+        container_name: php-fpm
+        volumes:
                 - ./www:/www
+        links:
+          - percona
     percona:
-          image: percona
-          container_name: percona
-          env_file:
-              - ".env"
-          environment:
-              - MYSQL_DATABASE=${MYSQL_DATABASE}
-              - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-              - MYSQL_USER=${MYSQL_USER}
-              - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-          ports:
-              - "3306:3306"
-          volumes:
-              - ./mysql:/var/lib/mysql
-              - ./percona.cnf:/etc/mysql/percona-server.conf.d/percona.cnf
+        image: percona
+        container_name: percona
+        env_file:
+            - ".env"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./mysql:/var/lib/mysql
+            - ./percona.cnf:/etc/mysql/percona-server.conf.d/percona.cnf
