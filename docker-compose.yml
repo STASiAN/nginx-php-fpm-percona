@@ -33,4 +33,5 @@ services:
           ports:
               - "3306:3306"
           volumes:
-              - "./mysql:/var/lib/mysql"
+              - ./mysql:/var/lib/mysql
+              - ./percona.cnf:/etc/mysql/percona-server.conf.d/percona.cnf
